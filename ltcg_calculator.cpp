@@ -122,16 +122,36 @@ int main() {
     try {
         auto csvData = readCSV(csvFilePath);
         InflationCalculator inflationCalculator(csvData);
-        TaxRate taxRate(0.20); // 20% tax rate
+        TaxRate oldTaxRate(0.20); // 20% tax rate with inflation adjustment
+        TaxRate newTaxRate(0.125); // 12.5% tax rate without inflation adjustment
 
         double sellingPrice = inflationCalculator.calculateSellingPrice(initialYear, sellYear, initialPrice);
-        double actualProfit = inflationCalculator.calculateActualProfit(initialPrice, sellingPrice, initialYear, sellYear);
-        double ltcgTax = taxRate.apply(actualProfit);
+
+        // Old scheme
+        double oldActualProfit = inflationCalculator.calculateActualProfit(initialPrice, sellingPrice, initialYear, sellYear);
+        double oldLtcgTax = oldTaxRate.apply(oldActualProfit);
+
+        // New scheme
+        double newProfit = sellingPrice - initialPrice;
+        double newLtcgTax = newTaxRate.apply(newProfit);
 
         // Output results
         std::cout << std::fixed << std::setprecision(2);
         std::cout << "Estimated Selling Price: Rs " << sellingPrice << std::endl;
-        std::cout << "LTCG Tax to be Paid (20% with inflation adjustment): Rs " << ltcgTax << std::endl;
+        std::cout << "LTCG Tax to be Paid (Old Scheme 20% with inflation adjustment): Rs " << oldLtcgTax << std::endl;
+        std::cout << "LTCG Tax to be Paid (New Scheme 12.5% without inflation adjustment): Rs " << newLtcgTax << std::endl;
+
+        // Compare and output the difference
+        double taxDifference = std::abs(oldLtcgTax - newLtcgTax);
+
+        if (oldLtcgTax > newLtcgTax) {
+            std::cout << "Old scheme leads to higher taxes by Rs " << taxDifference << std::endl;
+        } else if (newLtcgTax > oldLtcgTax) {
+            std::cout << "New scheme leads to higher taxes by Rs " << taxDifference << std::endl;
+        } else {
+            std::cout << "Both schemes lead to the same tax amount." << std::endl;
+        }
+
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
