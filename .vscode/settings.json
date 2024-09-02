@@ -1,9 +1,0 @@
-{
-  "makefile.launchConfigurations": [
-    {
-      "cwd": "c:\\Users\\Admin\\Desktop\\inflation\\main",
-      "binaryPath": "c:\\Users\\Admin\\Desktop\\inflation\\main\\ltcg_optimized",
-      "binaryArgs": []
-    }
-  ]
-}
